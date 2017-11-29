@@ -18,8 +18,8 @@ include_directories(include)
 
 option(BUILD_EXAMPLES "Build examples." ON)
 if(BUILD_EXAMPLES)
-	subdirs(example)
-endif(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 ################################
 # gtest
