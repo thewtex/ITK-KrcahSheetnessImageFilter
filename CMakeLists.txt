@@ -25,13 +25,9 @@ endif()
 # gtest
 ################################
 if (test)
-	add_subdirectory(lib/googletest)
-	enable_testing()
-	set(GTEST_INCLUDE_DIRS ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-	include_directories(${GTEST_INCLUDE_DIRS})
+  find_package(GTest REQUIRED)
+  enable_testing()
+  include_directories(${GTEST_INCLUDE_DIRS})
 
-	##############
-	# Unit Tests
-	##############
-	subdirs(test)
+  add_subdirectory(test)
 endif()
