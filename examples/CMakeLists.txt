@@ -1,7 +1,28 @@
-# Descoteaux
-if(NOT ECHO_ITK_WARNING)
-  message(WARNING "ITK must be compiled with Module_LesionSizingToolkit turned on to use Descoteaux Sheetness")
-  option(ECHO_ITK_WARNING "Echo warning about Module_LesionSizingToolkit" ON)
-endif()
+cmake_minimum_required(VERSION 2.8.12)
+project(KrcahSheetnessExamples)
 
-subdirs(Descoteaux DescoteauxWithScaling DescoteauxMax Krcah ModifiedSheetness)
+# LesionSizingToolkit contains Descoteaux sheetness
+find_package(ITK REQUIRED COMPONENTS
+  ITKBinaryMathematicalMorphology
+  ITKCommon
+  ITKConnectedComponents
+  ITKDistanceMap
+  ITKIOImageBase
+  ITKImageFeature
+  ITKImageFilterBase
+  ITKImageIntensity
+  ITKImageStatistics
+  ITKLabelMap
+  ITKMathematicalMorphology
+  ITKThresholding
+  ITKImageIO
+  LesionSizingToolkit
+  KrcahSheetness
+)
+include(${ITK_USE_FILE})
+
+add_subdirectory(Descoteaux)
+add_subdirectory(DescoteauxWithScaling)
+add_subdirectory(DescoteauxMax)
+add_subdirectory(Krcah)
+add_subdirectory(ModifiedSheetness)

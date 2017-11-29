@@ -15,7 +15,7 @@
 #include "itkSignedMaurerDistanceMapImageFilter.h"
 #include "itkUnsharpMaskImageFilter.h"
 
-#include "AutomaticSheetnessParameterEstimationImageFilter.h"
+#include "itkAutomaticSheetnessParameterEstimationImageFilter.h"
 #include "ModifiedSheetnessImageFilter.h"
 #include "MaximumAbsoluteValueImageFilter.h"
 #include <vector>
@@ -142,158 +142,158 @@ std::ostream &operator<<(std::ostream &os, ArgumentDatabase const &db) {
     return os;
 }
 
-typename SheetnessImageType::Pointer calculateSheetnessAtScale(
-     typename InputImageType::Pointer inputFilePointer
-    , typename MaskImageType::Pointer maskFilePointer
-    , double sigma
-    , double automaticSheetnessScale
-    , double unsharpAmount
-    , int label = 1
-) {
-    // Gaussian Blur at scale
-    std::cout << "Unsharp masking" << std::endl;
-    typename UnsharpMaskImageFilterType::Pointer unsharpFilter = UnsharpMaskImageFilterType::New();
-    unsharpFilter->SetInput(inputFilePointer);
-    unsharpFilter->SetSigma(sigma);
-    unsharpFilter->SetAmount(unsharpAmount);
-    unsharpFilter->ClampOn();
-    unsharpFilter->SetThreshold(0);
-    unsharpFilter->Update();
+SheetnessImageType::Pointer
+calculateSheetnessAtScale( InputImageType::Pointer inputFilePointer,
+  MaskImageType::Pointer maskFilePointer,
+  double sigma,
+  double automaticSheetnessScale,
+  double unsharpAmount,
+  int label = 1 )
+{
+  // Gaussian Blur at scale
+  std::cout << "Unsharp masking" << std::endl;
+  UnsharpMaskImageFilterType::Pointer unsharpFilter = UnsharpMaskImageFilterType::New();
+  unsharpFilter->SetInput(inputFilePointer);
+  unsharpFilter->SetSigma(sigma);
+  unsharpFilter->SetAmount(unsharpAmount);
+  unsharpFilter->ClampOn();
+  unsharpFilter->SetThreshold(0);
+  unsharpFilter->Update();
 
-    // Hessian + EigenAnalysis
-    std::cout << "Computing Hessian and performing Eigen-analysis" << std::endl;
-    typename HessianFilterType::Pointer hessian = HessianFilterType::New();
-    hessian->SetInput(unsharpFilter->GetOutput());
-    hessian->SetSigma(sigma);
+  // Hessian + EigenAnalysis
+  std::cout << "Computing Hessian and performing Eigen-analysis" << std::endl;
+  HessianFilterType::Pointer hessian = HessianFilterType::New();
+  hessian->SetInput(unsharpFilter->GetOutput());
+  hessian->SetSigma(sigma);
 
-    EigenAnalysisFilterType::Pointer eigen = EigenAnalysisFilterType::New();
-    eigen->SetDimension(IMAGE_DIMENSION);
-    eigen->SetInput(hessian->GetOutput());
-    eigen->Update();
+  EigenAnalysisFilterType::Pointer eigen = EigenAnalysisFilterType::New();
+  eigen->SetDimension(IMAGE_DIMENSION);
+  eigen->SetInput(hessian->GetOutput());
+  eigen->Update();
 
-    // Get scaling parameters
-    std::cout << "Automatically determining scaling parameters" << std::endl;
-    typename AutomaticSheetnessParameterEstimationImageFilterType::Pointer scalerFilter = AutomaticSheetnessParameterEstimationImageFilterType::New();
-    scalerFilter->SetInput(eigen->GetOutput());
-    scalerFilter->SetLabelInput(maskFilePointer);
-    scalerFilter->SetLabel(label);
-    scalerFilter->SetScale(automaticSheetnessScale);
-    scalerFilter->Update();
+  // Get scaling parameters
+  std::cout << "Automatically determining scaling parameters" << std::endl;
+  AutomaticSheetnessParameterEstimationImageFilterType::Pointer scalerFilter = AutomaticSheetnessParameterEstimationImageFilterType::New();
+  scalerFilter->SetInput(eigen->GetOutput());
+  scalerFilter->SetLabelInput(maskFilePointer);
+  scalerFilter->SetLabel(label);
+  scalerFilter->SetScale(automaticSheetnessScale);
+  scalerFilter->Update();
 
-    std::cout << "Determined Sheetness parameters: " << std::endl;
-    std::cout << "  Alpha " << scalerFilter->GetAlpha() << std::endl;
-    std::cout << "  Beta  " << scalerFilter->GetBeta() << std::endl;
-    std::cout << "  C     " << scalerFilter->GetC() << std::endl;
+  std::cout << "Determined Sheetness parameters: " << std::endl;
+  std::cout << "  Alpha " << scalerFilter->GetAlpha() << std::endl;
+  std::cout << "  Beta  " << scalerFilter->GetBeta() << std::endl;
+  std::cout << "  C     " << scalerFilter->GetC() << std::endl;
 
-    // compute sheetness
-    std::cout << "Computing sheetness..." << std::endl;
-    typename ModifiedSheetnessImageFilterType::Pointer sheetnessFilter = ModifiedSheetnessImageFilterType::New();
-    sheetnessFilter->SetInput(scalerFilter->GetOutput());
-    sheetnessFilter->DetectBrightSheetsOn();
-    sheetnessFilter->SetNormalization(scalerFilter->GetAlpha());
-    sheetnessFilter->SetNoiseNormalization(scalerFilter->GetC());
-    sheetnessFilter->Update();
+  // compute sheetness
+  std::cout << "Computing sheetness..." << std::endl;
+  ModifiedSheetnessImageFilterType::Pointer sheetnessFilter = ModifiedSheetnessImageFilterType::New();
+  sheetnessFilter->SetInput(scalerFilter->GetOutput());
+  sheetnessFilter->DetectBrightSheetsOn();
+  sheetnessFilter->SetNormalization(scalerFilter->GetAlpha());
+  sheetnessFilter->SetNoiseNormalization(scalerFilter->GetC());
+  sheetnessFilter->Update();
 
-    return sheetnessFilter->GetOutput();
+  return sheetnessFilter->GetOutput();
 }
 
 
 int main(int argc, char *argv[]) {
-    // Parse arguments
-    ArgumentDatabase db(argc, argv);
-    if (db.HasFailed()){
-        return EXIT_FAILURE;
-    } else {
-        std::cout << db;
-    }
+  // Parse arguments
+  ArgumentDatabase db(argc, argv);
+  if (db.HasFailed()){
+      return EXIT_FAILURE;
+  } else {
+      std::cout << db;
+  }
 
-    // read input
-    std::cout << "Reading input " << db.inputFileName << std::endl;
-    typename FileReaderType::Pointer reader = FileReaderType::New();
-    reader->SetFileName(db.inputFileName);
-    reader->Update();
+  // read input
+  std::cout << "Reading input " << db.inputFileName << std::endl;
+  FileReaderType::Pointer reader = FileReaderType::New();
+  reader->SetFileName(db.inputFileName);
+  reader->Update();
 
-    std::cout << "Preprocessing..." << std::endl;
-    // Threshold
-    typename BinaryThresholdImageFilterType::Pointer binaryFilter = BinaryThresholdImageFilterType::New();
-    binaryFilter->SetInput(reader->GetOutput());
-    // binaryFilter->SetLowerThreshold(db.threshold);
-    // binaryFilter->SetOutsideValue(0);
-    // binaryFilter->SetInsideValue(1);
-    binaryFilter->SetLowerThreshold(db.threshold);
-    binaryFilter->SetInsideValue(255);
-    binaryFilter->SetOutsideValue(0);
-    binaryFilter->Update();
+  std::cout << "Preprocessing..." << std::endl;
+  // Threshold
+  BinaryThresholdImageFilterType::Pointer binaryFilter = BinaryThresholdImageFilterType::New();
+  binaryFilter->SetInput(reader->GetOutput());
+  // binaryFilter->SetLowerThreshold(db.threshold);
+  // binaryFilter->SetOutsideValue(0);
+  // binaryFilter->SetInsideValue(1);
+  binaryFilter->SetLowerThreshold(db.threshold);
+  binaryFilter->SetInsideValue(255);
+  binaryFilter->SetOutsideValue(0);
+  binaryFilter->Update();
 
-    // Distance transform
-    SignedMaurerDistanceMapImageFilterType::Pointer dtFilter = SignedMaurerDistanceMapImageFilterType::New();
-    dtFilter->SetInput(binaryFilter->GetOutput());
+  // Distance transform
+  SignedMaurerDistanceMapImageFilterType::Pointer dtFilter = SignedMaurerDistanceMapImageFilterType::New();
+  dtFilter->SetInput(binaryFilter->GetOutput());
 
-    // Threshold the distance transform
-    BinaryThresholdDTImageFilterType::Pointer dtThreshFilter = BinaryThresholdDTImageFilterType::New();
-    dtThreshFilter->SetInput(dtFilter->GetOutput());
-    dtThreshFilter->SetUpperThreshold(db.dtThreshold);
-    dtThreshFilter->SetOutsideValue(0);
-    dtThreshFilter->SetInsideValue(1);
-    dtThreshFilter->Update();
+  // Threshold the distance transform
+  BinaryThresholdDTImageFilterType::Pointer dtThreshFilter = BinaryThresholdDTImageFilterType::New();
+  dtThreshFilter->SetInput(dtFilter->GetOutput());
+  dtThreshFilter->SetUpperThreshold(db.dtThreshold);
+  dtThreshFilter->SetOutsideValue(0);
+  dtThreshFilter->SetInsideValue(1);
+  dtThreshFilter->Update();
 
-    // // Write
-    // std::cout << "Writing mask image to " << db.outputMaskFileName << std::endl;
-    // MaskWriterType::Pointer maskWriter = MaskWriterType::New();
-    // // maskWriter->SetInput(erosionFilter->GetOutput());
-    // maskWriter->SetInput(dtThreshFilter->GetOutput());
-    // maskWriter->SetFileName(db.outputMaskFileName);
-    // maskWriter->Update();
+  // // Write
+  // std::cout << "Writing mask image to " << db.outputMaskFileName << std::endl;
+  // MaskWriterType::Pointer maskWriter = MaskWriterType::New();
+  // // maskWriter->SetInput(erosionFilter->GetOutput());
+  // maskWriter->SetInput(dtThreshFilter->GetOutput());
+  // maskWriter->SetFileName(db.outputMaskFileName);
+  // maskWriter->Update();
 
-    // Loop over sigmas, take maximum value
-    std::cout << "Current sigma: " << db.sigmas.at(0) << std::endl;
-    typename SheetnessImageType::Pointer sheetnessFilePointer = calculateSheetnessAtScale(
-         reader->GetOutput()
-        // ,erosionFilter->GetOutput()
-        ,dtThreshFilter->GetOutput()
-        ,db.sigmas.at(0)
-        ,db.automaticSheetnessScale
-        ,db.unsharpAmount
-    );
+  // Loop over sigmas, take maximum value
+  std::cout << "Current sigma: " << db.sigmas.at(0) << std::endl;
+  SheetnessImageType::Pointer sheetnessFilePointer = calculateSheetnessAtScale(
+       reader->GetOutput()
+      // ,erosionFilter->GetOutput()
+      ,dtThreshFilter->GetOutput()
+      ,db.sigmas.at(0)
+      ,db.automaticSheetnessScale
+      ,db.unsharpAmount
+  );
 
-    if (db.sigmas.size() > 1) { // need for std::next()
-        for(ArgumentDatabase::TSigmas::const_iterator it = std::next(db.sigmas.begin()); it != db.sigmas.end(); ++it) {
-            std::cout << "Current sigma: " << *it << std::endl;
+  if (db.sigmas.size() > 1) { // need for std::next()
+      for(ArgumentDatabase::TSigmas::const_iterator it = ++(db.sigmas.begin()); it != db.sigmas.end(); ++it) {
+          std::cout << "Current sigma: " << *it << std::endl;
 
-            // Calculte the remaining (n-1) sheetnesses
-            typename SheetnessImageType::Pointer tempSheetnessFilePointer = calculateSheetnessAtScale(
-                 reader->GetOutput()
-                // ,erosionFilter->GetOutput()
-                ,dtThreshFilter->GetOutput()
-                ,*it
-                ,db.automaticSheetnessScale
-                ,db.unsharpAmount
-            );
+          // Calculte the remaining (n-1) sheetnesses
+          SheetnessImageType::Pointer tempSheetnessFilePointer = calculateSheetnessAtScale(
+               reader->GetOutput()
+              // ,erosionFilter->GetOutput()
+              ,dtThreshFilter->GetOutput()
+              ,*it
+              ,db.automaticSheetnessScale
+              ,db.unsharpAmount
+          );
 
-            // Take abs max
-            typename MaximumAbsoluteValueFilterType::Pointer maximumAbsoluteValueFilter = MaximumAbsoluteValueFilterType::New();
-            maximumAbsoluteValueFilter->SetInput1(sheetnessFilePointer);
-            maximumAbsoluteValueFilter->SetInput2(tempSheetnessFilePointer);
-            maximumAbsoluteValueFilter->Update();
+          // Take abs max
+          MaximumAbsoluteValueFilterType::Pointer maximumAbsoluteValueFilter = MaximumAbsoluteValueFilterType::New();
+          maximumAbsoluteValueFilter->SetInput1(sheetnessFilePointer);
+          maximumAbsoluteValueFilter->SetInput2(tempSheetnessFilePointer);
+          maximumAbsoluteValueFilter->Update();
 
-            // Save max and move on
-            sheetnessFilePointer = maximumAbsoluteValueFilter->GetOutput();
-        }
-    }
+          // Save max and move on
+          sheetnessFilePointer = maximumAbsoluteValueFilter->GetOutput();
+      }
+  }
 
-    // Scale the image
-    typename ShiftScaleImageFilterType::Pointer scaler = ShiftScaleImageFilterType::New();
-    scaler->SetInput(sheetnessFilePointer);
-    scaler->SetScale(db.intensityScaling);
+  // Scale the image
+  ShiftScaleImageFilterType::Pointer scaler = ShiftScaleImageFilterType::New();
+  scaler->SetInput(sheetnessFilePointer);
+  scaler->SetScale(db.intensityScaling);
 
-    // write output
-    std::cout << std::endl;
-    std::cout << "writing sheetness to file " << db.outputFileName << std::endl;
-    typename SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
-    writer->SetFileName(db.outputFileName);
-    writer->SetInput(scaler->GetOutput());
-    writer->Update();
+  // write output
+  std::cout << std::endl;
+  std::cout << "writing sheetness to file " << db.outputFileName << std::endl;
+  SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
+  writer->SetFileName(db.outputFileName);
+  writer->SetInput(scaler->GetOutput());
+  writer->Update();
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 

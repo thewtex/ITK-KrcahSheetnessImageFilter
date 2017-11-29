@@ -13,7 +13,7 @@
 #include "itkLabelStatisticsImageFilter.h"
 #include "itkShiftScaleImageFilter.h"
 
-#include "AutomaticSheetnessParameterEstimationImageFilter.h"
+#include "itkAutomaticSheetnessParameterEstimationImageFilter.h"
 
 // Templating
 const unsigned int IMAGE_DIMENSION = 3;
@@ -32,11 +32,11 @@ typedef itk::HessianRecursiveGaussianImageFilter< InputImageType >  HessianFilte
 typedef HessianFilterType::OutputImageType                          HessianImageType;
 typedef HessianImageType::PixelType                                 HessianPixelType;
 
-typedef  itk::FixedArray< double, HessianPixelType::Dimension >     EigenValueArrayType;
-typedef  itk::Image< EigenValueArrayType, IMAGE_DIMENSION >               EigenValueImageType;
+typedef itk::FixedArray< double, HessianPixelType::Dimension > EigenValueArrayType;
+typedef itk::Image< EigenValueArrayType, IMAGE_DIMENSION >     EigenValueImageType;
 
-typedef  itk::SymmetricEigenAnalysisImageFilter<HessianImageType, EigenValueImageType>     EigenAnalysisFilterType;
-typedef itk::DescoteauxSheetnessImageFilter< EigenValueImageType, SheetnessImageType >   DescoteauxSheetnessFilterType;
+typedef itk::SymmetricEigenAnalysisImageFilter<HessianImageType, EigenValueImageType>   EigenAnalysisFilterType;
+typedef itk::DescoteauxSheetnessImageFilter< EigenValueImageType, SheetnessImageType >  DescoteauxSheetnessFilterType;
 
 typedef itk::BinaryThresholdImageFilter<InputImageType, MaskImageType> BinaryThresholdImageFilterType;
 typedef itk::ThresholdImageFilter<InputImageType> ThresholdImageFilterType;

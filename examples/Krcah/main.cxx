@@ -4,7 +4,7 @@
 #include "itkCastImageFilter.h"
 
 // sheetness
-#include "KrcahSheetnessFeatureGenerator.h"
+#include "itkKrcahSheetnessFeatureGenerator.h"
 
 // exclude regions
 #include "itkBinaryThresholdImageFilter.h"
@@ -55,103 +55,104 @@ MaskImageType::Pointer getExclusionRegionNotBkg(InputImageType::Pointer input, S
 // expected CLI call:
 // ./KrcahSheetness /path/to/input /path/to/outputSheetness /path/to/outputExclusionNotBone /path/to/outputExclusionNotBackground
 int main(int argc, char *argv[]) {
-    // Verify arguments
-    if (argc != 5) {
-        std::cerr << "Required: inputImage.mhd outputSheetness.mhd outputBackground.mhd outputForeground.mhd" << std::endl;
-        std::cerr << "inputImage.mhd:        3D image in Hounsfield Units -1024 to 3071" << std::endl;
-        std::cerr << "outputSheetness.mhd:   3D image sheetness results." << std::endl;
-        std::cerr << "                       Pixeltype float, ranging from -1 to 1." << std::endl;
-        std::cerr << "outputBackground.mhd:  3D image background mask." << std::endl;
-        std::cerr << "                       Pixeltype unsigned char, pixel value 1 indicating background." << std::endl;
-        std::cerr << "outputForeground.mhd:  3D image foreground mask" << std::endl;
-        std::cerr << "                       Pixeltype unsigned char, pixel value 1 indicating foreground." << std::endl;
-        return EXIT_FAILURE;
-    }
+  // Verify arguments
+  if (argc != 5)
+  {
+    std::cerr << "Required: inputImage.mhd outputSheetness.mhd outputBackground.mhd outputForeground.mhd" << std::endl;
+    std::cerr << "inputImage.mhd:        3D image in Hounsfield Units -1024 to 3071" << std::endl;
+    std::cerr << "outputSheetness.mhd:   3D image sheetness results." << std::endl;
+    std::cerr << "                       Pixeltype float, ranging from -1 to 1." << std::endl;
+    std::cerr << "outputBackground.mhd:  3D image background mask." << std::endl;
+    std::cerr << "                       Pixeltype unsigned char, pixel value 1 indicating background." << std::endl;
+    std::cerr << "outputForeground.mhd:  3D image foreground mask" << std::endl;
+    std::cerr << "                       Pixeltype unsigned char, pixel value 1 indicating foreground." << std::endl;
+    return EXIT_FAILURE;
+  }
 
-    // read input
-    FileReaderType::Pointer inputReader = readImage(argv[1]);
-    InputImageType::Pointer inputImage = inputReader->GetOutput();
+  // read input
+  FileReaderType::Pointer inputReader = readImage(argv[1]);
+  InputImageType::Pointer inputImage = inputReader->GetOutput();
 
-    // generate sheetness
-    std::cout << "generating sheetness..." << std::endl;
-    SheetnessImageType::Pointer sheetnessImage = getSheetnessImage(inputImage);
+  // generate sheetness
+  std::cout << "generating sheetness..." << std::endl;
+  SheetnessImageType::Pointer sheetnessImage = getSheetnessImage(inputImage);
 
-    // first exclude region 'not bone'
-    std::cout << "generating exlusion regions" << std::endl;
-    MaskImageType::Pointer exclusionNotBone = getExclusionRegionNotBone(inputImage);
+  // first exclude region 'not bone'
+  std::cout << "generating exlusion regions" << std::endl;
+  MaskImageType::Pointer exclusionNotBone = getExclusionRegionNotBone(inputImage);
 
-    FileReaderType::Pointer inputReader2 = readImage(argv[1]);
-    InputImageType::Pointer inputImage2 = inputReader2->GetOutput();
+  FileReaderType::Pointer inputReader2 = readImage(argv[1]);
+  InputImageType::Pointer inputImage2 = inputReader2->GetOutput();
 
 //    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(1);
-    MaskImageType::Pointer exclusionNotBkg = getExclusionRegionNotBkg(inputImage2, sheetnessImage);
+  MaskImageType::Pointer exclusionNotBkg = getExclusionRegionNotBkg(inputImage2, sheetnessImage);
 
-    // write output
-    std::cout << "writing sheetness to file..." << std::endl;
-    FileWriterType::Pointer writer = FileWriterType::New();
-    writer->SetFileName(argv[2]);
-    writer->SetInput(sheetnessImage);
-    writer->Update();
+  // write output
+  std::cout << "writing sheetness to file..." << std::endl;
+  FileWriterType::Pointer writer = FileWriterType::New();
+  writer->SetFileName(argv[2]);
+  writer->SetInput(sheetnessImage);
+  writer->Update();
 
-    std::cout << "writing exclusion regions" << std::endl;
-    MaskWriterType::Pointer writerExcludeNotBone = MaskWriterType::New();
-    writerExcludeNotBone->SetFileName(argv[3]);
-    writerExcludeNotBone->SetInput(exclusionNotBone);
-    writerExcludeNotBone->Update();
+  std::cout << "writing exclusion regions" << std::endl;
+  MaskWriterType::Pointer writerExcludeNotBone = MaskWriterType::New();
+  writerExcludeNotBone->SetFileName(argv[3]);
+  writerExcludeNotBone->SetInput(exclusionNotBone);
+  writerExcludeNotBone->Update();
 
-    MaskWriterType::Pointer writerExcludeNotBkg = MaskWriterType::New();
-    writerExcludeNotBkg->SetFileName(argv[4]);
-    writerExcludeNotBkg->SetInput(exclusionNotBkg);
-    writerExcludeNotBkg->Update();
+  MaskWriterType::Pointer writerExcludeNotBkg = MaskWriterType::New();
+  writerExcludeNotBkg->SetFileName(argv[4]);
+  writerExcludeNotBkg->SetInput(exclusionNotBkg);
+  writerExcludeNotBkg->Update();
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 MaskImageType::Pointer getExclusionRegionNotBkg(InputImageType::Pointer input, SheetnessImageType::Pointer sheetness) {
-    BinaryFunctorFilterType::Pointer notBackgroundRegionFilter = BinaryFunctorFilterType::New();
-    notBackgroundRegionFilter->SetInput1(input);
-    notBackgroundRegionFilter->SetInput2(sheetness);
+  BinaryFunctorFilterType::Pointer notBackgroundRegionFilter = BinaryFunctorFilterType::New();
+  notBackgroundRegionFilter->SetInput1(input);
+  notBackgroundRegionFilter->SetInput2(sheetness);
 
-    notBackgroundRegionFilter->Update();
-    return notBackgroundRegionFilter->GetOutput();
+  notBackgroundRegionFilter->Update();
+  return notBackgroundRegionFilter->GetOutput();
 }
 
 MaskImageType::Pointer getExclusionRegionNotBone(InputImageType::Pointer input) {
-    // threshold
-    BinaryThresholdFilterType::Pointer thresholdFilter = BinaryThresholdFilterType::New();
-    thresholdFilter->SetUpperThreshold(-50);
-    thresholdFilter->SetInsideValue(255); // ConnectedComponentImageFilter assumes 0 is background
-    thresholdFilter->SetOutsideValue(0);
-    thresholdFilter->SetInput(input);
+  // threshold
+  BinaryThresholdFilterType::Pointer thresholdFilter = BinaryThresholdFilterType::New();
+  thresholdFilter->SetUpperThreshold(-50);
+  thresholdFilter->SetInsideValue(255); // ConnectedComponentImageFilter assumes 0 is background
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->SetInput(input);
 
-    // find connected components
-    ConnectedComponentFilterType::Pointer connectedComponentFilter = ConnectedComponentFilterType::New();
-    connectedComponentFilter->SetInput(thresholdFilter->GetOutput());
+  // find connected components
+  ConnectedComponentFilterType::Pointer connectedComponentFilter = ConnectedComponentFilterType::New();
+  connectedComponentFilter->SetInput(thresholdFilter->GetOutput());
 
-    // extract largest connected component
-    KeepNObjectsFilterType::Pointer keepNObjectsFilter = KeepNObjectsFilterType::New();
-    keepNObjectsFilter->SetBackgroundValue(0);
-    keepNObjectsFilter->SetNumberOfObjects(1);
-    keepNObjectsFilter->SetAttribute(KeepNObjectsFilterType::LabelObjectType::NUMBER_OF_PIXELS);
-    keepNObjectsFilter->SetInput(connectedComponentFilter->GetOutput());
+  // extract largest connected component
+  KeepNObjectsFilterType::Pointer keepNObjectsFilter = KeepNObjectsFilterType::New();
+  keepNObjectsFilter->SetBackgroundValue(0);
+  keepNObjectsFilter->SetNumberOfObjects(1);
+  keepNObjectsFilter->SetAttribute(KeepNObjectsFilterType::LabelObjectType::NUMBER_OF_PIXELS);
+  keepNObjectsFilter->SetInput(connectedComponentFilter->GetOutput());
 
-    // cast to output. pixel value for region = 1, 'background' = 0
-    LabelToMaskCastFilter::Pointer castFilter = LabelToMaskCastFilter::New();
-    castFilter->SetInput(keepNObjectsFilter->GetOutput());
+  // cast to output. pixel value for region = 1, 'background' = 0
+  LabelToMaskCastFilter::Pointer castFilter = LabelToMaskCastFilter::New();
+  castFilter->SetInput(keepNObjectsFilter->GetOutput());
 
-    castFilter->Update();
-    return castFilter->GetOutput();
+  castFilter->Update();
+  return castFilter->GetOutput();
 }
 
 SheetnessImageType::Pointer getSheetnessImage(InputImageType::Pointer input) {
-    KrcahSheetnessFeatureGenerator::Pointer generator = KrcahSheetnessFeatureGenerator::New();
-    generator->SetInput(input);
-    generator->Update();
-    return generator->GetOutput();
+  KrcahSheetnessFeatureGenerator::Pointer generator = KrcahSheetnessFeatureGenerator::New();
+  generator->SetInput(input);
+  generator->Update();
+  return generator->GetOutput();
 }
 
 FileReaderType::Pointer readImage(char *path) {
-    FileReaderType::Pointer reader = FileReaderType::New();
-    reader->SetFileName(path);
-    return reader;
+  FileReaderType::Pointer reader = FileReaderType::New();
+  reader->SetFileName(path);
+  return reader;
 }
