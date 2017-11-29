@@ -1,5 +1,22 @@
-#ifndef AutomaticSheetnessParameterEstimationImageFilter_h
-#define AutomaticSheetnessParameterEstimationImageFilter_h
+/*=========================================================================
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+#ifndef itkAutomaticSheetnessParameterEstimationImageFilter_h
+#define itkAutomaticSheetnessParameterEstimationImageFilter_h
 
 #include "FrobeniusNormImageFilter.h"
 #include "itkLabelStatisticsImageFilter.h"
@@ -8,14 +25,16 @@
 namespace itk
 {
 
-template <class TInputImage, class TLabelImage>
-class ITK_EXPORT AutomaticSheetnessParameterEstimationImageFilter : public ImageToImageFilter<TInputImage, TInputImage> {
+template< typename TInputImage, typename TLabelImage >
+class ITK_TEMPLATE_EXPORT AutomaticSheetnessParameterEstimationImageFilter:
+  public ImageToImageFilter<TInputImage, TInputImage>
+{
 public:
   /** Standard class typedefs. */
-  typedef AutomaticSheetnessParameterEstimationImageFilter    Self;
-  typedef SmartPointer<Self>                Pointer;
-  typedef SmartPointer<const Self>          ConstPointer;
-  typedef typename TLabelImage::PixelType TLabelPixelType;
+  typedef AutomaticSheetnessParameterEstimationImageFilter Self;
+  typedef SmartPointer<Self>                               Pointer;
+  typedef SmartPointer<const Self>                         ConstPointer;
+  typedef typename TLabelImage::PixelType                  TLabelPixelType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -40,7 +59,7 @@ public:
 
   const TLabelImage * GetLabelInput() const{
     return itkDynamicCastInDebugMode< TLabelImage * >( const_cast< DataObject * >( this->ProcessObject::GetInput(1) ) );
-  }  
+  }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   /** Begin concept checking */
@@ -55,6 +74,7 @@ public:
 protected:
   AutomaticSheetnessParameterEstimationImageFilter();
   virtual ~AutomaticSheetnessParameterEstimationImageFilter();
+
   void GenerateData() ITK_OVERRIDE;
 private:
   AutomaticSheetnessParameterEstimationImageFilter(const Self&); //purposely not implemented
@@ -80,7 +100,7 @@ private:
 } // namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "AutomaticSheetnessParameterEstimationImageFilter.hxx"
+#include "itkAutomaticSheetnessParameterEstimationImageFilter.hxx"
 #endif
 
 #endif /* AutomaticSheetnessParameterEstimationImageFilter_h */
