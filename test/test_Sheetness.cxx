@@ -1,3 +1,20 @@
+/*=========================================================================
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 #include <iostream>
 #include "gtest/gtest.h"
 
@@ -7,9 +24,9 @@
 #include "KrcahBackgroundFunctor.h"
 
 TEST(TraceFunctor, double2x2) {
-    typedef double InternalPixelType;
+    typedef double                                               InternalPixelType;
     typedef itk::SymmetricSecondRankTensor<InternalPixelType, 2> MatrixType;
-    typedef itk::Functor::Trace<MatrixType, InternalPixelType> FunctorType;
+    typedef itk::Functor::Trace<MatrixType, InternalPixelType>   FunctorType;
     FunctorType trace;
     MatrixType a;
 
@@ -56,9 +73,9 @@ TEST(TraceFunctor, double2x2) {
 }
 
 TEST(TraceFunctor, double3x3) {
-    typedef double InternalPixelType;
+    typedef double                                               InternalPixelType;
     typedef itk::SymmetricSecondRankTensor<InternalPixelType, 3> MatrixType;
-    typedef itk::Functor::Trace<MatrixType, InternalPixelType> FunctorType;
+    typedef itk::Functor::Trace<MatrixType, InternalPixelType>   FunctorType;
     FunctorType trace;
     MatrixType a;
 
@@ -72,9 +89,9 @@ TEST(TraceFunctor, double3x3) {
 
 TEST(TraceFunctor, double99x99) {
     const unsigned int DIMENSION = 99;
-    typedef double InternalPixelType;
+    typedef double                                                       InternalPixelType;
     typedef itk::SymmetricSecondRankTensor<InternalPixelType, DIMENSION> MatrixType;
-    typedef itk::Functor::Trace<MatrixType, InternalPixelType> FunctorType;
+    typedef itk::Functor::Trace<MatrixType, InternalPixelType>           FunctorType;
     FunctorType trace;
     MatrixType a;
 
@@ -88,9 +105,9 @@ TEST(TraceFunctor, double99x99) {
 }
 
 TEST(TraceFunctor, int3x3) {
-    typedef int InternalPixelType;
+    typedef int                                                  InternalPixelType;
     typedef itk::SymmetricSecondRankTensor<InternalPixelType, 3> MatrixType;
-    typedef itk::Functor::Trace<MatrixType, InternalPixelType> FunctorType;
+    typedef itk::Functor::Trace<MatrixType, InternalPixelType>   FunctorType;
     FunctorType trace;
     MatrixType a;
 
@@ -103,9 +120,9 @@ TEST(TraceFunctor, int3x3) {
 }
 
 TEST(TraceFunctor, float3x3) {
-    typedef float InternalPixelType;
+    typedef float                                                InternalPixelType;
     typedef itk::SymmetricSecondRankTensor<InternalPixelType, 3> MatrixType;
-    typedef itk::Functor::Trace<MatrixType, InternalPixelType> FunctorType;
+    typedef itk::Functor::Trace<MatrixType, InternalPixelType>   FunctorType;
     FunctorType trace;
     MatrixType a;
 

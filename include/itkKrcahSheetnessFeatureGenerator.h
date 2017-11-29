@@ -95,34 +95,34 @@ private:
   void operator=(const Self &);
 
   // parameters
-  double m_GaussVariance;
-  double m_ScalingConstant;
-  double m_Alpha;
-  double m_Beta;
-  double m_Gamma;
+  double              m_GaussVariance;
+  double              m_ScalingConstant;
+  double              m_Alpha;
+  double              m_Beta;
+  double              m_Gamma;
   SheetnessScalesType m_SheetnessScales;
 
   typename OutputImageType::Pointer GenerateSheetnessWithSigma(typename InputImageType::ConstPointer img, float sigma);
 
   // input processing
-  typedef CastImageFilter<InputImageType, InternalImageType> InputCastFilterType;
-  typedef DiscreteGaussianImageFilter<InternalImageType, InternalImageType> GaussianFilterType;
-  typedef SubtractImageFilter<InternalImageType, InternalImageType, InternalImageType> SubstractFilterType;
-  typedef MultiplyImageFilter<InternalImageType, InternalImageType, InternalImageType> MultiplyFilterType;
-  typedef AddImageFilter<InternalImageType, InternalImageType, InternalImageType> AddFilterType;
+  typedef CastImageFilter<InputImageType, InternalImageType>                                 InputCastFilterType;
+  typedef DiscreteGaussianImageFilter<InternalImageType, InternalImageType>                  GaussianFilterType;
+  typedef SubtractImageFilter<InternalImageType, InternalImageType, InternalImageType>       SubstractFilterType;
+  typedef MultiplyImageFilter<InternalImageType, InternalImageType, InternalImageType>       MultiplyFilterType;
+  typedef AddImageFilter<InternalImageType, InternalImageType, InternalImageType>            AddFilterType;
 
   // sheetness prerequisites
-  typedef HessianRecursiveGaussianImageFilter<InternalImageType> HessianFilterType;
-  typedef typename HessianFilterType::OutputImageType HessianImageType;
-  typedef typename HessianImageType::PixelType HessianPixelType;
-  typedef FixedArray<double, HessianPixelType::Dimension> EigenValueArrayType;
-  typedef Image<EigenValueArrayType, NDimension> EigenValueImageType;
-  typedef SymmetricEigenAnalysisImageFilter<HessianImageType, EigenValueImageType> EigenAnalysisFilterType;
-  typedef TraceImageFilter<HessianImageType, InternalImageType> TraceFilterType;
-  typedef StatisticsImageFilter<InternalImageType> StatisticsFilterType;
+  typedef HessianRecursiveGaussianImageFilter<InternalImageType>                             HessianFilterType;
+  typedef typename HessianFilterType::OutputImageType                                        HessianImageType;
+  typedef typename HessianImageType::PixelType                                               HessianPixelType;
+  typedef FixedArray<double, HessianPixelType::Dimension>                                    EigenValueArrayType;
+  typedef Image<EigenValueArrayType, NDimension>                                             EigenValueImageType;
+  typedef SymmetricEigenAnalysisImageFilter<HessianImageType, EigenValueImageType>           EigenAnalysisFilterType;
+  typedef TraceImageFilter<HessianImageType, InternalImageType>                              TraceFilterType;
+  typedef StatisticsImageFilter<InternalImageType>                                           StatisticsFilterType;
 
   // sheetness
-  typedef KrcahSheetnessImageFilter<EigenValueImageType, double, OutputImageType> SheetnessFilterType;
+  typedef KrcahSheetnessImageFilter<EigenValueImageType, double, OutputImageType>            SheetnessFilterType;
 
   // post processing
   typedef MaximumAbsoluteValueImageFilter<OutputImageType, OutputImageType, OutputImageType> MaximumAbsoluteValueFilterType;

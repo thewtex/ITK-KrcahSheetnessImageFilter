@@ -81,21 +81,21 @@ private:
   void operator=(const Self&); //purposely not implemented
 
   // Parameters
-  double m_Alpha;
-  double m_Beta;
-  double m_C;
-  double m_Scale;
+  double          m_Alpha;
+  double          m_Beta;
+  double          m_C;
+  double          m_Scale;
   TLabelPixelType m_Label;
 
   // Filter types
   itkStaticConstMacro(NDimension, unsigned int, TInputImage::ImageDimension);
-  typedef double FrobeniusImagePixelType;
-  typedef Image<FrobeniusImagePixelType, NDimension> TFrobeniusOutputImage;
+  typedef double                                                         FrobeniusImagePixelType;
+  typedef Image<FrobeniusImagePixelType, NDimension>                     TFrobeniusOutputImage;
 
-  typedef FrobeniusNormImageFilter<TInputImage, TFrobeniusOutputImage> FrobeniusNormImageFilterType;
+  typedef FrobeniusNormImageFilter<TInputImage, TFrobeniusOutputImage>   FrobeniusNormImageFilterType;
   typedef LabelStatisticsImageFilter<TFrobeniusOutputImage, TLabelImage> LabelStatisticsImageFilterType;
-  typedef StatisticsImageFilter<TFrobeniusOutputImage> StatisticsImageFilterType;
-}; // class AutomaticSheetnessParameterEstimationImageFilter
+  typedef StatisticsImageFilter<TFrobeniusOutputImage>                   StatisticsImageFilterType;
+};
 
 } // namespace itk
 
