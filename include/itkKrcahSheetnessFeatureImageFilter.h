@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkKrcahSheetnessFeatureGenerator_h
-#define itkKrcahSheetnessFeatureGenerator_h
+#ifndef itkKrcahSheetnessFeatureImageFilter_h
+#define itkKrcahSheetnessFeatureImageFilter_h
 
 #include "itkImageToImageFilter.h"
 #include "itkCastImageFilter.h"
@@ -38,18 +38,18 @@ namespace itk
 {
 
 template<typename TInput, typename TOutput>
-class ITK_TEMPLATE_EXPORT KrcahSheetnessFeatureGenerator:
+class ITK_TEMPLATE_EXPORT KrcahSheetnessFeatureImageFilter:
   public ImageToImageFilter<TInput, TOutput>
 {
 public:
-  typedef KrcahSheetnessFeatureGenerator      Self;
+  typedef KrcahSheetnessFeatureImageFilter    Self;
   typedef ImageToImageFilter<TInput, TOutput> Superclass;
   typedef SmartPointer<Self>                  Pointer;
   typedef SmartPointer<const Self>            ConstPointer;
 
   itkNewMacro(Self);
 
-  itkTypeMacro(KrcahSheetnessFeatureGenerator, ImageToImageFilter);
+  itkTypeMacro(KrcahSheetnessFeatureImageFilter, ImageToImageFilter);
 
   itkStaticConstMacro(NDimension, unsigned int, TInput::ImageDimension);
 
@@ -84,14 +84,14 @@ public:
   }
 
 protected:
-  KrcahSheetnessFeatureGenerator();
+  KrcahSheetnessFeatureImageFilter();
 
-  virtual ~KrcahSheetnessFeatureGenerator();
+  virtual ~KrcahSheetnessFeatureImageFilter();
 
   void GenerateData() ITK_OVERRIDE;
 
 private:
-  KrcahSheetnessFeatureGenerator(const Self &);
+  KrcahSheetnessFeatureImageFilter(const Self &);
   void operator=(const Self &);
 
   // parameters
@@ -131,7 +131,7 @@ private:
 } // namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkKrcahSheetnessFeatureGenerator.hxx"
+#include "itkKrcahSheetnessFeatureImageFilter.hxx"
 #endif
 
-#endif // itkKrcahSheetnessFeatureGenerator_h
+#endif // itkKrcahSheetnessFeatureImageFilter_h

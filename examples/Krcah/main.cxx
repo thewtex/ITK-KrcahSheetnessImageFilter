@@ -4,7 +4,7 @@
 #include "itkCastImageFilter.h"
 
 // sheetness
-#include "itkKrcahSheetnessFeatureGenerator.h"
+#include "itkKrcahSheetnessFeatureImageFilter.h"
 
 // exclude regions
 #include "itkBinaryThresholdImageFilter.h"
@@ -30,7 +30,7 @@ typedef itk::ImageFileWriter<SheetnessImageType> FileWriterType;
 typedef itk::ImageFileWriter<MaskImageType> MaskWriterType;
 
 // sheetness
-typedef itk::KrcahSheetnessFeatureGenerator<InputImageType, SheetnessImageType> KrcahSheetnessFeatureGenerator;
+typedef itk::KrcahSheetnessFeatureImageFilter<InputImageType, SheetnessImageType> KrcahSheetnessFeatureImageFilter;
 
 // not bone region
 typedef unsigned long LabelPixelType;
@@ -146,7 +146,7 @@ MaskImageType::Pointer getExclusionRegionNotBone(InputImageType::Pointer input) 
 }
 
 SheetnessImageType::Pointer getSheetnessImage(InputImageType::Pointer input) {
-  KrcahSheetnessFeatureGenerator::Pointer generator = KrcahSheetnessFeatureGenerator::New();
+  KrcahSheetnessFeatureImageFilter::Pointer generator = KrcahSheetnessFeatureImageFilter::New();
   generator->SetInput(input);
   generator->Update();
   return generator->GetOutput();

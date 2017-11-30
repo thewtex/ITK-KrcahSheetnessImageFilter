@@ -15,17 +15,17 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkKrcahSheetnessFeatureGenerator_hxx
-#define itkKrcahSheetnessFeatureGenerator_hxx
+#ifndef itkKrcahSheetnessFeatureImageFilter_hxx
+#define itkKrcahSheetnessFeatureImageFilter_hxx
 
-#include "itkKrcahSheetnessFeatureGenerator.h"
+#include "itkKrcahSheetnessFeatureImageFilter.h"
 
 namespace itk
 {
 
 template<typename TInput, typename TOutput>
-KrcahSheetnessFeatureGenerator<TInput, TOutput>
-::KrcahSheetnessFeatureGenerator()
+KrcahSheetnessFeatureImageFilter<TInput, TOutput>
+::KrcahSheetnessFeatureImageFilter()
 // suggested values by Krcah el. al.
   : m_GaussVariance(1) // =s
   , m_ScalingConstant(10) // =k
@@ -39,14 +39,14 @@ KrcahSheetnessFeatureGenerator<TInput, TOutput>
 
 
 template<typename TInput, typename TOutput>
-KrcahSheetnessFeatureGenerator<TInput, TOutput>
-::~KrcahSheetnessFeatureGenerator()
+KrcahSheetnessFeatureImageFilter<TInput, TOutput>
+::~KrcahSheetnessFeatureImageFilter()
 {
 }
 
 
 template<typename TInput, typename TOutput>
-void KrcahSheetnessFeatureGenerator<TInput, TOutput>
+void KrcahSheetnessFeatureImageFilter<TInput, TOutput>
 ::GenerateData()
 {
   // get input
@@ -82,7 +82,7 @@ void KrcahSheetnessFeatureGenerator<TInput, TOutput>
 
 
 template<typename TInput, typename TOutput>
-typename TOutput::Pointer KrcahSheetnessFeatureGenerator<TInput, TOutput>
+typename TOutput::Pointer KrcahSheetnessFeatureImageFilter<TInput, TOutput>
 ::GenerateSheetnessWithSigma(typename TInput::ConstPointer input, float sigma)
 {
   /******
@@ -151,4 +151,4 @@ typename TOutput::Pointer KrcahSheetnessFeatureGenerator<TInput, TOutput>
 
 } // end namespace itk
 
-#endif // itkKrcahSheetnessFeatureGenerator_hxx
+#endif // itkKrcahSheetnessFeatureImageFilter_hxx
