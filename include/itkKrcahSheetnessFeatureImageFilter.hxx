@@ -35,6 +35,17 @@ KrcahSheetnessFeatureImageFilter<TInput, TOutput>
   m_SheetnessScales.push_back(1.00);
 
   this->SetNumberOfRequiredInputs(1);
+
+  m_InputCastFilter = InputCastFilterType::New();
+  m_GaussianFilter = GaussianFilterType::New();
+  m_SubtractFilter = SubtractFilterType::New();
+  m_MultiplyFilter = MultiplyFilterType::New();
+  m_AddFilter = AddFilterType::New();
+  m_HessianFilter = HessianFilterType::New();
+  m_EigenAnalysisFilter = EigenAnalysisFilterType::New();
+  m_TraceFilter = TraceFilterType::New();
+  m_StatisticsFilter = StatisticsFilterType::New();
+  m_SheetnessFilter = SheetnessFilterType::New();
 }
 
 
@@ -50,94 +61,102 @@ void KrcahSheetnessFeatureImageFilter<TInput, TOutput>
 ::GenerateData()
 {
   // get input
-  typename InputImageType::ConstPointer input(this->GetInput());
+  typename InputImageType::Pointer input = InputImageType::New();
+  input->Graft( const_cast< InputImageType * >( this->GetInput() ));
 
   // assert we have a valid m_SheetnessScales
-  assert(m_SheetnessScales.size() > 0);
+  if(m_SheetnessScales.empty())
+    {
+    itkExceptionMacro( "SheetnessScales is empty!" );
+    }
+
+  TOutput * output = this->GetOutput();
 
   // Calculate first sheetness
-  typename OutputImageType::Pointer sheetnessOutputImageTypePointer = GenerateSheetnessWithSigma(input, m_SheetnessScales.at(0));
+  typename OutputImageType::Pointer sheetnessOutput = OutputImageType::New();
+  sheetnessOutput->CopyInformation( output );
+  sheetnessOutput->SetBufferedRegion( output->GetBufferedRegion() );
+  sheetnessOutput->SetRequestedRegion( output->GetRequestedRegion() );
+  sheetnessOutput->Allocate();
 
-  if (m_SheetnessScales.size() > 1)
-  { // need for std::next()
-  for(SheetnessScalesType::iterator scalesIterator = ++(m_SheetnessScales.begin()); scalesIterator != m_SheetnessScales.end(); ++scalesIterator)
+  GenerateSheetnessWithSigma(input, sheetnessOutput, m_SheetnessScales.at(0));
+
+  if( m_SheetnessScales.size() > 1 )
     {
-    // Calculte the remaining (n-1) sheetnesses
-    typename OutputImageType::Pointer tempSheetnessOutputImageTypePointer = GenerateSheetnessWithSigma(input, (*scalesIterator));
+    typename OutputImageType::Pointer tempSheetnessOutput = OutputImageType::New();
+    tempSheetnessOutput->CopyInformation( sheetnessOutput );
+    tempSheetnessOutput->SetBufferedRegion( sheetnessOutput->GetBufferedRegion() );
+    tempSheetnessOutput->SetRequestedRegion( sheetnessOutput->GetRequestedRegion() );
+    tempSheetnessOutput->Allocate();
+    for( SheetnessScalesType::iterator scalesIterator = ++(m_SheetnessScales.begin()); scalesIterator != m_SheetnessScales.end(); ++scalesIterator )
+      {
+      // Calculte the remaining (n-1) sheetnesses
+      GenerateSheetnessWithSigma( input, tempSheetnessOutput, (*scalesIterator) );
 
-    // Take abs max
-    typename MaximumAbsoluteValueFilterType::Pointer maximumAbsoluteValueFilter = MaximumAbsoluteValueFilterType::New();
-    maximumAbsoluteValueFilter->SetInput1(sheetnessOutputImageTypePointer);
-    maximumAbsoluteValueFilter->SetInput2(tempSheetnessOutputImageTypePointer);
-    maximumAbsoluteValueFilter->Update();
+      // Take abs max
+      typename MaximumAbsoluteValueFilterType::Pointer maximumAbsoluteValueFilter = MaximumAbsoluteValueFilterType::New();
+      maximumAbsoluteValueFilter->SetInput1( sheetnessOutput );
+      maximumAbsoluteValueFilter->SetInput2( tempSheetnessOutput );
+      maximumAbsoluteValueFilter->Update();
 
-    // Save max and move on
-    sheetnessOutputImageTypePointer = maximumAbsoluteValueFilter->GetOutput();
+      // Save max and move on
+      sheetnessOutput = maximumAbsoluteValueFilter->GetOutput();
+      }
     }
-  }
 
   // copy output
-  this->GetOutput()->Graft(sheetnessOutputImageTypePointer);
+  output->Graft( sheetnessOutput );
 }
 
 
 template<typename TInput, typename TOutput>
-typename TOutput::Pointer KrcahSheetnessFeatureImageFilter<TInput, TOutput>
-::GenerateSheetnessWithSigma(typename TInput::ConstPointer input, float sigma)
+void
+KrcahSheetnessFeatureImageFilter<TInput, TOutput>
+::GenerateSheetnessWithSigma(TInput * input, TOutput * output, double sigma)
 {
   /******
   * Input preprocessing
   ******/
-  typename InputCastFilterType::Pointer castFilter = InputCastFilterType::New();
-  castFilter->SetInput(input);
+  m_InputCastFilter->SetInput(input);
 
   // I*G (discrete gauss)
-  typename GaussianFilterType::Pointer m_DiffusionFilter = GaussianFilterType::New();
-  m_DiffusionFilter->SetVariance(m_GaussianSigma * m_GaussianSigma); // =s
-  m_DiffusionFilter->SetInput(castFilter->GetOutput());
+  m_GaussianFilter->SetVariance(m_GaussianSigma * m_GaussianSigma); // =s
+  m_GaussianFilter->SetInput(m_InputCastFilter->GetOutput());
 
   // I - (I*G)
-  typename SubstractFilterType::Pointer m_SubstractFilter = SubstractFilterType::New();
-  m_SubstractFilter->SetInput1(castFilter->GetOutput());
-  m_SubstractFilter->SetInput2(m_DiffusionFilter->GetOutput());
+  m_SubtractFilter->SetInput1(m_InputCastFilter->GetOutput());
+  m_SubtractFilter->SetInput2(m_GaussianFilter->GetOutput());
 
   // k(I-(I*G))
-  typename MultiplyFilterType::Pointer m_MultiplyFilter = MultiplyFilterType::New();
-  m_MultiplyFilter->SetInput(m_SubstractFilter->GetOutput());
+  m_MultiplyFilter->SetInput(m_SubtractFilter->GetOutput());
   m_MultiplyFilter->SetConstant(m_ScalingConstant); // =k
 
   // I+k*(I-(I*G))
-  typename AddFilterType::Pointer m_AddFilter = AddFilterType::New();
-  m_AddFilter->SetInput1(castFilter->GetOutput());
+  m_AddFilter->SetInput1(m_InputCastFilter->GetOutput());
   m_AddFilter->SetInput2(m_MultiplyFilter->GetOutput());
 
   /******
   * sheetness prerequisites
   ******/
   // hessian
-  typename HessianFilterType::Pointer m_HessianFilter = HessianFilterType::New();
   m_HessianFilter->SetSigma(sigma);
   m_HessianFilter->SetInput(m_AddFilter->GetOutput());
 
   // eigen analysis
-  typename EigenAnalysisFilterType::Pointer m_EigenAnalysisFilter = EigenAnalysisFilterType::New();
   m_EigenAnalysisFilter->SetDimension(NDimension);
   m_EigenAnalysisFilter->SetInput(m_HessianFilter->GetOutput());
 
   // calculate trace
-  typename TraceFilterType::Pointer m_TraceFilter = TraceFilterType::New();
   m_TraceFilter->SetImageDimension(NDimension);
   m_TraceFilter->SetInput(m_HessianFilter->GetOutput());
 
   // calculate average
-  typename StatisticsFilterType::Pointer m_StatisticsFilter = StatisticsFilterType::New();
   m_StatisticsFilter->SetInput(m_TraceFilter->GetOutput());
   m_StatisticsFilter->Update(); // needed! ->GetMean() will not trigger an update!
 
   /******
   * Sheetness
   ******/
-  typename SheetnessFilterType::Pointer m_SheetnessFilter = SheetnessFilterType::New();
   m_SheetnessFilter->SetInput(m_EigenAnalysisFilter->GetOutput());
   m_SheetnessFilter->SetConstant(m_StatisticsFilter->GetMean());
   m_SheetnessFilter->SetAlpha(m_Alpha);
@@ -145,8 +164,9 @@ typename TOutput::Pointer KrcahSheetnessFeatureImageFilter<TInput, TOutput>
   m_SheetnessFilter->SetGamma(m_Gamma);
 
   // return
+  m_SheetnessFilter->GetOutput()->Graft( output );
   m_SheetnessFilter->Update();
-  return m_SheetnessFilter->GetOutput();
+  output->Graft( m_SheetnessFilter->GetOutput() );
 }
 
 } // end namespace itk
