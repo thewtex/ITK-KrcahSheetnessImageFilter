@@ -27,8 +27,8 @@ template<typename TInput, typename TOutput>
 KrcahSheetnessFeatureImageFilter<TInput, TOutput>
 ::KrcahSheetnessFeatureImageFilter()
 // suggested values by Krcah el. al.
-  : m_GaussVariance(1) // =s
-  , m_ScalingConstant(10) // =k
+  : m_GaussianSigma(1.0) // =s
+  , m_ScalingConstant(10.0) // =k
   , m_Alpha(0.5), m_Beta(0.5), m_Gamma(0.25)
 {
   m_SheetnessScales.push_back(0.75);
@@ -93,7 +93,7 @@ typename TOutput::Pointer KrcahSheetnessFeatureImageFilter<TInput, TOutput>
 
   // I*G (discrete gauss)
   typename GaussianFilterType::Pointer m_DiffusionFilter = GaussianFilterType::New();
-  m_DiffusionFilter->SetVariance(m_GaussVariance); // =s
+  m_DiffusionFilter->SetVariance(m_GaussianSigma * m_GaussianSigma); // =s
   m_DiffusionFilter->SetInput(castFilter->GetOutput());
 
   // I - (I*G)

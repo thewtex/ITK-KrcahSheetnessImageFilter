@@ -37,7 +37,7 @@
 namespace itk
 {
 
-template<typename TInput, typename TOutput>
+template< typename TInput, typename TOutput >
 class ITK_TEMPLATE_EXPORT KrcahSheetnessFeatureImageFilter:
   public ImageToImageFilter<TInput, TOutput>
 {
@@ -59,33 +59,34 @@ public:
   typedef TOutput                                  OutputImageType;
   typedef std::vector<double>                      SheetnessScalesType; // 1-dimensional vector of sigmas
 
-  void SetGaussVariance(double d) {
-      m_GaussVariance = d;
-  }
+  /** Unsharp mask Gaussian sigma. */
+  itkSetMacro( GaussianSigma, double );
+  itkGetConstMacro( GaussianSigma, double );
 
-  void SetScalingConstant(double d) {
-      m_ScalingConstant = d;
-  }
+  /** Unsharp mask scaling factor */
+  itkSetMacro( ScalingConstant, double );
+  itkGetConstMacro( ScalingConstant, double );
 
-  void SetAlpha(double d) {
-      m_Alpha = d;
-  }
+  /** Sheetness normalization */
+  itkSetMacro( Alpha, double );
+  itkGetConstMacro( Alpha, double );
 
-  void SetBeta(double d) {
-      m_Beta = d;
-  }
+  /** Tubeness normalization */
+  itkSetMacro( Beta, double );
+  itkGetConstMacro( Beta, double );
 
-  void SetGamma(double d) {
-      m_Gamma = d;
-  }
+  /** Hessian noise normalization */
+  itkSetMacro( Gamma, double );
+  itkGetConstMacro( Gamma, double );
 
-  void SetSheetnessScales(SheetnessScalesType v) {
+  void SetSheetnessScales(SheetnessScalesType v)
+    {
       m_SheetnessScales = v;
-  }
+      this->Modified();
+    }
 
 protected:
   KrcahSheetnessFeatureImageFilter();
-
   virtual ~KrcahSheetnessFeatureImageFilter();
 
   void GenerateData() ITK_OVERRIDE;
@@ -95,7 +96,7 @@ private:
   void operator=(const Self &);
 
   // parameters
-  double              m_GaussVariance;
+  double              m_GaussianSigma;
   double              m_ScalingConstant;
   double              m_Alpha;
   double              m_Beta;
