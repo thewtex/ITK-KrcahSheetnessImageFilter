@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
     // read input
     std::cout << "Reading input " << argv[1] << std::endl;
-    typename FileReaderType::Pointer reader = FileReaderType::New();
+    FileReaderType::Pointer reader = FileReaderType::New();
     reader->SetFileName(argv[1]);
     reader->Update();
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
     // write output
     std::cout << "writing sheetness to file " << argv[2] << std::endl;
-    typename SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
+    SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
     writer->SetFileName(argv[2]);
     writer->SetInput(sheetnessFilter->GetOutput());
     writer->Update();
