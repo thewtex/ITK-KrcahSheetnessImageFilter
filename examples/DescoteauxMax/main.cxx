@@ -14,7 +14,7 @@
 #include "itkShiftScaleImageFilter.h"
 
 #include "itkAutomaticSheetnessParameterEstimationImageFilter.h"
-#include "MaximumAbsoluteValueImageFilter.h"
+#include "itkMaximumAbsoluteValueImageFilter.h"
 #include <vector>
 
 // Templating
@@ -219,7 +219,8 @@ int main(int argc, char *argv[]) {
       ,db.automaticSheetnessScale
   );
 
-  if (db.sigmas.size() > 1) { // need for std::next()
+  if (db.sigmas.size() > 1)
+    {
       for(ArgumentDatabase::TSigmas::const_iterator it = ++(db.sigmas.begin()); it != db.sigmas.end(); ++it) {
           std::cout << "Current sigma: " << *it << std::endl;
 

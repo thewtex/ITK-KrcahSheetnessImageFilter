@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
     // read input
     std::cout << "Reading input " << argv[1] << std::endl;
-    typename FileReaderType::Pointer reader = FileReaderType::New();
+    FileReaderType::Pointer reader = FileReaderType::New();
     reader->SetFileName(argv[1]);
     reader->Update();
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     std::cout << "  SE Radius         " << radius << std::endl;
 
     // Threshold
-    typename BinaryThresholdImageFilterType::Pointer binaryFilter = BinaryThresholdImageFilterType::New();
+    BinaryThresholdImageFilterType::Pointer binaryFilter = BinaryThresholdImageFilterType::New();
     binaryFilter->SetInput(reader->GetOutput());
     binaryFilter->SetLowerThreshold(threshold);
     binaryFilter->SetOutsideValue(0);
@@ -88,14 +88,14 @@ int main(int argc, char *argv[]) {
     structuringElement.SetRadius(radius);
     structuringElement.CreateStructuringElement();
 
-    typename BinaryErodeImageFilterType::Pointer erosionFilter = BinaryErodeImageFilterType::New();
+    BinaryErodeImageFilterType::Pointer erosionFilter = BinaryErodeImageFilterType::New();
     erosionFilter->SetInput(binaryFilter->GetOutput());
     erosionFilter->SetKernel(structuringElement);
     erosionFilter->SetErodeValue(1);
     erosionFilter->Update();
 
     // // Mask
-    // typename MaskImageFilterType::Pointer maskingFilter = MaskImageFilterType::New();
+    // MaskImageFilterType::Pointer maskingFilter = MaskImageFilterType::New();
     // maskingFilter->SetInput(reader->GetOutput());
     // maskingFilter->SetMaskImage(erosionFilter->GetOutput());
     // // maskingFilter->SetMaskingValue(1);
@@ -103,12 +103,12 @@ int main(int argc, char *argv[]) {
     // maskingFilter->Update();
 
     // std::cout << "Writing mask to " << argv[4] << std::endl;
-    // typename MaskWriterType::Pointer maskWriter = MaskWriterType::New();
+    // MaskWriterType::Pointer maskWriter = MaskWriterType::New();
     // maskWriter->SetFileName(argv[4]);
     // maskWriter->SetInput(erosionFilter->GetOutput());
     // maskWriter->Update();
 
-    // typename ThresholdImageFilterType::Pointer thresFilter = ThresholdImageFilterType::New();
+    // ThresholdImageFilterType::Pointer thresFilter = ThresholdImageFilterType::New();
     // thresFilter->SetInput(reader->GetOutput());
     // thresFilter->SetOutsideValue(threshold);
     // thresFilter->ThresholdBelow(threshold);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
     // Hessian + EigenAnalysis
     std::cout << "Computing Hessian and performing Eigen-analysis" << std::endl;
-    typename HessianFilterType::Pointer hessian = HessianFilterType::New();
+    HessianFilterType::Pointer hessian = HessianFilterType::New();
     hessian->SetInput(reader->GetOutput());
     hessian->SetSigma(sigma);
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 
     // Get scaling parameters
     std::cout << "Automatically determining scaling parameters" << std::endl;
-    typename AutomaticSheetnessParameterEstimationImageFilterType::Pointer scalerFilter = AutomaticSheetnessParameterEstimationImageFilterType::New();
+    AutomaticSheetnessParameterEstimationImageFilterType::Pointer scalerFilter = AutomaticSheetnessParameterEstimationImageFilterType::New();
     scalerFilter->SetInput(eigen->GetOutput());
     scalerFilter->SetLabelInput(erosionFilter->GetOutput());
     scalerFilter->SetLabel(1);
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 
     // compute sheetness
     std::cout << "Computing sheetness..." << std::endl;
-    typename DescoteauxSheetnessFilterType::Pointer sheetnessFilter = DescoteauxSheetnessFilterType::New();
+    DescoteauxSheetnessFilterType::Pointer sheetnessFilter = DescoteauxSheetnessFilterType::New();
     sheetnessFilter->SetInput(scalerFilter->GetOutput());
     sheetnessFilter->SetDetectBrightSheets(true);
     sheetnessFilter->SetSheetnessNormalization(scalerFilter->GetAlpha());
@@ -150,13 +150,13 @@ int main(int argc, char *argv[]) {
     sheetnessFilter->Update();
 
     // Scale the image
-    typename ShiftScaleImageFilterType::Pointer scaler = ShiftScaleImageFilterType::New();
+    ShiftScaleImageFilterType::Pointer scaler = ShiftScaleImageFilterType::New();
     scaler->SetInput(sheetnessFilter->GetOutput());
     scaler->SetScale(100);
 
     // write output
     std::cout << "writing sheetness to file " << argv[2] << std::endl;
-    typename SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
+    SheetnessWriterType::Pointer writer = SheetnessWriterType::New();
     writer->SetFileName(argv[2]);
     writer->SetInput(scaler->GetOutput());
     writer->Update();

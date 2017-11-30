@@ -17,7 +17,7 @@
  *=========================================================================*/
 #include "gtest/gtest.h"
 
-#include "ModifiedSheetnessImageFilter.h"
+#include "itkModifiedSheetnessImageFilter.h"
 
 namespace
 {

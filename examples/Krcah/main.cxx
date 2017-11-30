@@ -13,7 +13,8 @@
 #include "itkRelabelComponentImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkBinaryFunctorImageFilter.h"
-#include "KrcahBackgroundFunctor.h"
+
+#include "itkKrcahBackgroundFunctor.h"
 
 
 // pixel / image type

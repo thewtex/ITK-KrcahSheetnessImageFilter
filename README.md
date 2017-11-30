@@ -1,5 +1,7 @@
+# ITKKrcahSheetness
+
 ## Description
-Implementation of graphcut segmentation based on a sheetness image filter as described by Krcah et. al.
+ITK module implementation of graphcut segmentation based on a sheetness image filter as described by Krcah et. al.
 
 If you are interested in the original implementation it is now available [here](https://github.com/mkrcah/bone-segmentation)
 
@@ -8,7 +10,7 @@ If you are interested in the original implementation it is now available [here](
 
 `./KrcahSheetness  /path/to/input /path/to/outputSheetness /path/to/background /path/to/foreground`
 
-Example: 
+Example:
 ```
 cd src/GraphCut3D/data/test/left_femur
 ../../../../../bin/KrcahSheetness input.nrrd sheetness.nrrd sheetness_background.nrrd sheetness_foreground.nrrd
@@ -18,7 +20,7 @@ cd src/GraphCut3D/data/test/left_femur
 
 `./KrcahGraphcut /path/to/outputSheetness /path/to/foreground /path/to/background /path/to/outputGraphcut sigma lambda `
 
-Example: 
+Example:
 ```
 cd src/GraphCut3D/data/test/left_femur
 ../../../../../bin/KrcahGraphcut sheetness.nrrd sheetness_foreground.nrrd sheetness_background.nrrd sheetness_graphcut.nrrd 0.2 5.0
@@ -28,7 +30,7 @@ cd src/GraphCut3D/data/test/left_femur
 
 `./KrcahSplit /path/to/outputGraphcut /path/to/outputSplitObject erosion_radius intermediate_image_prefix(optional) `
 
-Example: 
+Example:
 ```
 cd src/GraphCut3D/data/test/left_femur
 ../../../../../bin/KrcahSplit sheetness_graphcut.nrrd sheetness_graphcut_split.nrrd 3 sheetness

@@ -19,9 +19,9 @@
 #include "gtest/gtest.h"
 
 #include "itkSymmetricSecondRankTensor.h"
-#include "TraceImageFilter.h"
-#include "MaximumAbsoluteValueImageFilter.h"
-#include "KrcahBackgroundFunctor.h"
+#include "itkTraceImageFilter.h"
+#include "itkMaximumAbsoluteValueImageFilter.h"
+#include "itkKrcahBackgroundFunctor.h"
 
 TEST(TraceFunctor, double2x2) {
     typedef double                                               InternalPixelType;

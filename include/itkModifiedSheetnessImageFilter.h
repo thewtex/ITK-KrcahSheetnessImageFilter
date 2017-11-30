@@ -1,15 +1,35 @@
-#ifndef ModifiedSheetnessImageFilter_h
-#define ModifiedSheetnessImageFilter_h
+/*=========================================================================
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+#ifndef itkModifiedSheetnessImageFilter_h
+#define itkModifiedSheetnessImageFilter_h
 
 #include "itkUnaryFunctorImageFilter.h"
 #include "vnl/vnl_math.h"
 
-namespace itk {
+namespace itk
+{
 
-namespace Functor {  
-  
-template< class TInput, class TOutput>
-class ModifiedSheetness {
+namespace Functor
+{
+
+template< typename TInput, typename TOutput>
+class ModifiedSheetness
+{
 public:
   ModifiedSheetness() {
     m_Alpha = 0.5;              // Suggested value from Vesselness paper
@@ -45,14 +65,14 @@ public:
       // If l3 approx. 0, Rs -> inf, sheetness -> 0
       return static_cast<TOutput>( sheetness );
     }
-    
+
     const double Rt = l1 / (l2 + l3);
     const double Rn = vcl_sqrt( l3*l3 + l2*l2 + l1*l1 );
 
     // Calculate sheetness
-    sheetness  =         m_DetectBrightSheets * (a3 / l3);
-    sheetness *=         vcl_exp( - ( Rt * Rt ) / ( 2.0 * m_Alpha  * m_Alpha  ) ); 
-    sheetness *= ( 1.0 - vcl_exp( - ( Rn * Rn ) / ( 2.0 * m_C     * m_C     ) ) ); 
+    sheetness = m_DetectBrightSheets * (a3 / l3);
+    sheetness *= vcl_exp( - ( Rt * Rt ) / ( 2.0 * m_Alpha  * m_Alpha  ) );
+    sheetness *= ( 1.0 - vcl_exp( - ( Rn * Rn ) / ( 2.0 * m_C     * m_C     ) ) );
 
     return static_cast<TOutput>( sheetness );
   }
@@ -78,7 +98,7 @@ public:
       tmpa = a1;
       a1 = a2;
       a2 = tmpa;
-    }   
+    }
 
     if( l2 > l3 ){
       tmpl = l3;
@@ -125,20 +145,19 @@ private:
 }; // class ModifiedSheetness
 } // namespace Functor
 
-template <class TInputImage, class TOutputImage>
-class ITK_EXPORT ModifiedSheetnessImageFilter :
-    public
-UnaryFunctorImageFilter<TInputImage,TOutputImage, 
-Functor::ModifiedSheetness< typename TInputImage::PixelType, 
+template <typename TInputImage, typename TOutputImage>
+class ITK_TEMPLATE_EXPORT ModifiedSheetnessImageFilter :
+    public UnaryFunctorImageFilter<TInputImage,TOutputImage,
+Functor::ModifiedSheetness< typename TInputImage::PixelType,
                                        typename TOutputImage::PixelType>   >
 {
 public:
   /** Standard class typedefs. */
-  typedef ModifiedSheetnessImageFilter    Self;
+  typedef ModifiedSheetnessImageFilter      Self;
   typedef UnaryFunctorImageFilter<
-    TInputImage,TOutputImage, 
-    Functor::ModifiedSheetness< 
-      typename TInputImage::PixelType, 
+    TInputImage,TOutputImage,
+    Functor::ModifiedSheetness<
+      typename TInputImage::PixelType,
       typename TOutputImage::PixelType> >   Superclass;
   typedef SmartPointer<Self>                Pointer;
   typedef SmartPointer<const Self>          ConstPointer;
@@ -147,8 +166,7 @@ public:
   itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(ModifiedSheetnessImageFilter, 
-               UnaryFunctorImageFilter);
+  itkTypeMacro(ModifiedSheetnessImageFilter, UnaryFunctorImageFilter);
 
   /** Set the normalization term for sheetness */
   void SetNormalization( double value ) {
@@ -188,4 +206,4 @@ private:
 
 } // end namespace itk
 
-#endif /* ModifiedSheetnessImageFilter_h */
+#endif /* itkModifiedSheetnessImageFilter_h */

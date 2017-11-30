@@ -28,9 +28,9 @@
 #include "itkSymmetricEigenAnalysisImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 
-#include "MaximumAbsoluteValueImageFilter.h"
-#include "KrcahSheetnessImageFilter.h"
-#include "TraceImageFilter.h"
+#include "itkMaximumAbsoluteValueImageFilter.h"
+#include "itkKrcahSheetnessImageFilter.h"
+#include "itkTraceImageFilter.h"
 
 #include <vector>
 

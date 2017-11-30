@@ -16,8 +16,8 @@
 #include "itkUnsharpMaskImageFilter.h"
 
 #include "itkAutomaticSheetnessParameterEstimationImageFilter.h"
-#include "ModifiedSheetnessImageFilter.h"
-#include "MaximumAbsoluteValueImageFilter.h"
+#include "itkModifiedSheetnessImageFilter.h"
+#include "itkMaximumAbsoluteValueImageFilter.h"
 #include <vector>
 
 // Templating

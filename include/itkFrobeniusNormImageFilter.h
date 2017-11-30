@@ -1,18 +1,36 @@
-#ifndef FrobeniusNormImageFilter_h
-#define FrobeniusNormImageFilter_h
+/*=========================================================================
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+#ifndef itkFrobeniusNormImageFilter_h
+#define itkFrobeniusNormImageFilter_h
 
 #include "vnl/vnl_math.h"
 
 namespace itk
 {
 
-namespace Function {  
-  
-template< class TInput, class TOutput>
+namespace Function
+{
+
+template< typename TInput, typename TOutput>
 class FrobeniusMatrixNorm
 {
 public:
-  FrobeniusMatrixNorm() 
+  FrobeniusMatrixNorm()
     {}
   ~FrobeniusMatrixNorm() {}
   bool operator!=( const FrobeniusMatrixNorm & ) const {
@@ -36,20 +54,18 @@ public:
 }; // class FrobeniusMatrixNorm
 } // Function
 
-template <class TInputImage, class TOutputImage>
-class ITK_EXPORT FrobeniusNormImageFilter :
-    public
-UnaryFunctorImageFilter<TInputImage,TOutputImage, 
-                        Function::FrobeniusMatrixNorm< typename TInputImage::PixelType, 
+template <typename TInputImage, typename TOutputImage>
+class ITK_TEMPLATE_EXPORT FrobeniusNormImageFilter:
+    public UnaryFunctorImageFilter<TInputImage,TOutputImage,
+                        Function::FrobeniusMatrixNorm< typename TInputImage::PixelType,
                                        typename TOutputImage::PixelType>   >
 {
-    public:
+public:
   /** Standard class typedefs. */
-  typedef FrobeniusNormImageFilter    Self;
-  typedef UnaryFunctorImageFilter<
-    TInputImage,TOutputImage, 
-    Function::FrobeniusMatrixNorm< 
-      typename TInputImage::PixelType, 
+  typedef FrobeniusNormImageFilter          Self;
+  typedef UnaryFunctorImageFilter< TInputImage,TOutputImage,
+    Function::FrobeniusMatrixNorm<
+      typename TInputImage::PixelType,
       typename TOutputImage::PixelType> >   Superclass;
   typedef SmartPointer<Self>                Pointer;
   typedef SmartPointer<const Self>          ConstPointer;
@@ -58,7 +74,7 @@ UnaryFunctorImageFilter<TInputImage,TOutputImage,
   itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(FrobeniusNormImageFilter, 
+  itkTypeMacro(FrobeniusNormImageFilter,
                UnaryFunctorImageFilter);
 
 #ifdef ITK_USE_CONCEPT_CHECKING

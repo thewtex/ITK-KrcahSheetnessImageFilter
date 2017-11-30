@@ -18,7 +18,7 @@
 #ifndef itkAutomaticSheetnessParameterEstimationImageFilter_h
 #define itkAutomaticSheetnessParameterEstimationImageFilter_h
 
-#include "FrobeniusNormImageFilter.h"
+#include "itkFrobeniusNormImageFilter.h"
 #include "itkLabelStatisticsImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 
